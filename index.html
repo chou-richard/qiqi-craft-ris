@@ -46,7 +46,7 @@ button:active{transform:translateY(3px);box-shadow:inset 0 0 0 2px #fff0a3,0 1px
     <div class="effect"><strong>道具效果</strong><span id="effectText">消除有圖示的方塊，就會發動驚喜！</span></div>
   </aside>
   <section class="board-wrap">
-    <div class="top-actions"><button id="pauseBtn" aria-label="暫停">暫停</button><button id="soundBtn" aria-label="切換音效">音效：開</button><button id="musicBtn" aria-label="切換背景音樂">音樂：開</button></div>
+    <div class="top-actions"><button id="pauseBtn" aria-label="暫停或繼續">暫停</button><button id="restartBtn" aria-label="重新開始">重玩</button><button id="soundBtn" aria-label="切換音效">音效:開</button><button id="musicBtn" aria-label="切換背景音樂">音樂:開</button><button id="closeBtn" aria-label="關閉遊戲">關閉</button></div>
     <div class="board-frame"><canvas id="board" width="300" height="600" aria-label="俄羅斯方塊遊戲區"></canvas></div>
   </section>
   <aside class="panel right">
@@ -63,6 +63,7 @@ button:active{transform:translateY(3px);box-shadow:inset 0 0 0 2px #fff0a3,0 1px
 </main>
 <div id="startModal" class="modal"><div class="card"><div class="trophy">💎</div><h2>齊齊，準備好了嗎？</h2><p>堆疊原創像素方塊、發動神奇道具，突破自己的最高紀錄！</p><button id="startBtn">開始冒險</button></div></div>
 <div id="overModal" class="modal hidden"><div class="card"><div class="trophy">⛏️</div><h2>這次探險結束了</h2><p id="overText"></p><button id="againBtn">再玩一次</button></div></div>
+<div id="closedModal" class="modal hidden"><div class="card"><div class="trophy">🌙</div><h2>遊戲已關閉</h2><p>音樂與遊戲已完全停止，現在可以安全關閉瀏覽器。</p><button id="reopenBtn">重新開始</button></div></div>
 <div id="trophyPop" class="modal hidden"><div class="card record-card"><div class="trophy">🏆</div><h2>恭喜齊齊打破紀錄！</h2><p>全新的最高分誕生了！</p></div></div>
 <div id="toast" class="toast"></div>
 <audio id="bgm" src="qiqi-bgm.wav" loop preload="auto" playsinline></audio>
@@ -111,10 +112,15 @@ function musicTick(){const melody=[659,784,880,784,659,523,587,659,698,880,784,6
 const bgm=$("bgm");bgm.volume=.38;
 function startMusic(){if(!music||!playing||paused)return;const p=bgm.play();if(p?.catch)p.catch(()=>{})}
 function stopMusic(){bgm.pause()}
+function stopAllAudio(){stopMusic();const a=window._qiqiAudio;if(a&&a.state!=="closed")a.suspend().catch(()=>{})}
+function restartGame(){$("closedModal").classList.add("hidden");bgm.currentTime=0;const a=audio();a?.resume?.();reset()}
+function closeGame(){playing=false;paused=true;cancelAnimationFrame(raf);stopAllAudio();$("closedModal").classList.remove("hidden");setTimeout(()=>{try{window.close()}catch{}},80)}
+function pauseForBackground(){if(playing&&!paused){paused=true;$("pauseBtn").textContent="繼續"}stopAllAudio()}
+document.addEventListener("visibilitychange",()=>{if(document.hidden)pauseForBackground()});window.addEventListener("pagehide",stopAllAudio);window.addEventListener("beforeunload",stopAllAudio);window.addEventListener("freeze",stopAllAudio)
 function act(a){({left:()=>move(-1),right:()=>move(1),rotate,down,drop:hardDrop,hold,pause}[a]||(()=>{}))()}
 document.addEventListener("keydown",e=>{const m={ArrowLeft:"left",ArrowRight:"right",ArrowUp:"rotate",ArrowDown:"down"," ":"drop",c:"hold",C:"hold",p:"pause",P:"pause"};if(m[e.key]){e.preventDefault();act(m[e.key])}});
 document.querySelectorAll("[data-act]").forEach(b=>{let timer,delay;b.addEventListener("pointerdown",e=>{e.preventDefault();b.setPointerCapture?.(e.pointerId);act(b.dataset.act);if(["left","right","down"].includes(b.dataset.act)){delay=setTimeout(()=>{timer=setInterval(()=>act(b.dataset.act),85)},280)}});const stop=()=>{clearTimeout(delay);clearInterval(timer)};b.addEventListener("pointerup",stop);b.addEventListener("pointercancel",stop);b.addEventListener("lostpointercapture",stop)});
-$("startBtn").onclick=()=>{$("startModal").classList.add("hidden");const a=audio();a?.resume?.();if(music){const p=bgm.play();if(p?.catch)p.catch(()=>{})}reset()};$("againBtn").onclick=reset;$("pauseBtn").onclick=pause;$("soundBtn").onclick=()=>{sound=!sound;$("soundBtn").textContent="音效："+(sound?"開":"關")};$("musicBtn").onclick=()=>{music=!music;$("musicBtn").textContent="音樂："+(music?"開":"關");if(music)startMusic();else stopMusic()};
+$("startBtn").onclick=()=>{$("startModal").classList.add("hidden");const a=audio();a?.resume?.();if(music){const p=bgm.play();if(p?.catch)p.catch(()=>{})}reset()};$("againBtn").onclick=restartGame;$("reopenBtn").onclick=restartGame;$("restartBtn").onclick=restartGame;$("closeBtn").onclick=closeGame;$("pauseBtn").onclick=pause;$("soundBtn").onclick=()=>{sound=!sound;$("soundBtn").textContent="音效:"+(sound?"開":"關")};$("musicBtn").onclick=()=>{music=!music;$("musicBtn").textContent="音樂:"+(music?"開":"關");if(music)startMusic();else stopMusic()};
 atlas.onload=()=>{best=+(localStorage.getItem("qiqi-craftris-best")||0);$("best").textContent=best.toLocaleString();drawMinis();draw()};
 })();
 </script>
