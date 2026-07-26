@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>齊齊專屬的俄羅斯方塊</title>
+<style>
+:root{--ink:#fff7d6;--gold:#ffd54a;--panel:rgba(11,21,31,.88);--edge:#6d4421}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;overflow-x:hidden}
+body{font-family:"Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif;color:var(--ink);background:#102838 url("qiqi-world.png") center/cover fixed;image-rendering:pixelated}
+body:before{content:"";position:fixed;inset:0;background:linear-gradient(180deg,rgba(0,30,60,.06),rgba(0,8,15,.52));z-index:-1}
+button{font:inherit;font-weight:900;color:#3b260a;border:3px solid #5b3717;border-radius:4px;background:linear-gradient(#ffe982,#f0a928);box-shadow:inset 0 0 0 2px #fff0a3,0 4px 0 #42260d;cursor:pointer;touch-action:manipulation}
+button:active{transform:translateY(3px);box-shadow:inset 0 0 0 2px #fff0a3,0 1px 0 #42260d}
+.shell{min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:12px}
+.game{width:min(980px,100%);display:grid;grid-template-columns:210px minmax(280px,390px) 210px;gap:14px;align-items:center}
+.panel{background:var(--panel);border:5px solid #52351e;outline:3px solid #9c6832;box-shadow:inset 0 0 0 3px #213a40,0 10px 30px #0008;padding:14px}
+.brand{text-align:center;margin-bottom:12px}.brand small{display:block;color:#aaf4ff;font-weight:900;letter-spacing:2px}.brand h1{font-size:23px;line-height:1.15;margin:5px 0;color:#fff5b8;text-shadow:3px 3px #4f2c0d}
+.stat{display:flex;justify-content:space-between;align-items:end;border-bottom:2px dashed #8a754b;padding:9px 0}.stat span{color:#b8d6d9;font-size:13px}.stat b{font-size:24px;color:#ffe265}
+.goal{margin:12px 0;background:#071018;border:2px solid #76562e;padding:8px}.goal-top{display:flex;justify-content:space-between;font-size:12px}.bar{height:10px;margin-top:6px;border:2px solid #000;background:#333}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#24cdea,#ffe24d);transition:width .3s}
+.effect{min-height:58px;margin-top:10px;padding:8px;background:#151d22;border:2px solid #4f6d70;font-size:13px}.effect strong{color:#7ef8ff;display:block;margin-bottom:4px}
+.board-wrap{position:relative;justify-self:center}.board-frame{padding:8px;background:#181817;border:7px solid #6b4525;outline:4px solid #bb7d3b;box-shadow:0 15px 35px #000c,inset 0 0 0 3px #25170d}
+#board{display:block;width:min(38vw,calc((100dvh - 95px)/2),360px);height:auto;aspect-ratio:1/2;background:rgba(4,11,16,.86);image-rendering:pixelated}
+.top-actions{display:flex;gap:8px;justify-content:center;margin-bottom:9px}.top-actions button{padding:7px 12px}
+.box{margin-bottom:12px;text-align:center}.box h2{font-size:14px;color:#aadce2;margin:0 0 7px;letter-spacing:2px}.mini{display:block;margin:auto;width:118px;height:88px;background:#071016;border:3px solid #6e5232;image-rendering:pixelated}
+.help{font-size:12px;line-height:1.7;color:#c8d7d4}.key{display:inline-block;min-width:25px;text-align:center;background:#e7d8ad;color:#342717;border:2px solid #7d684a;border-radius:3px;font-weight:900}
+.touch{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:12px}.touch-title{grid-column:1/-1;text-align:center;color:#aadce2;font-size:13px;font-weight:900;letter-spacing:2px}.touch button{min-width:0;width:100%;padding:0;min-height:50px;font-size:22px}.touch .wide{grid-column:span 2;font-size:14px}
+.modal{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:#06111bd9;padding:18px}.modal.hidden{display:none}.card{max-width:520px;text-align:center;padding:28px;background:linear-gradient(#162c33,#0c171d);border:6px solid #8b5b2c;outline:4px solid #d99b45;box-shadow:0 0 55px #000}.card .trophy{font-size:80px;filter:drop-shadow(0 0 15px #ffd700);animation:bounce .7s infinite alternate}.card h2{margin:8px 0;color:#ffe46d;font-size:30px;text-shadow:3px 3px #5b350b}.card p{color:#d7e6e3}.card button{padding:12px 30px;font-size:18px}
+#trophyPop{pointer-events:none;background:#06111b99}.record-card{animation:pop 1s both}.record-card h2{font-size:36px}
+.toast{position:fixed;z-index:30;left:50%;top:18px;transform:translateX(-50%) translateY(-80px);padding:10px 20px;background:#10242c;border:3px solid #f7c94b;color:#fff;border-radius:4px;font-weight:900;transition:.25s}.toast.show{transform:translateX(-50%) translateY(0)}
+@keyframes bounce{to{transform:scale(1.13) rotate(8deg)}}@keyframes pop{0%{transform:scale(.2) rotate(-12deg);opacity:0}70%{transform:scale(1.12) rotate(3deg)}100%{transform:scale(1);opacity:1}}
+@media(max-width:900px){.shell{padding:6px;align-items:start}.game{grid-template-columns:minmax(132px,1fr) minmax(250px,360px) minmax(132px,1fr);gap:7px}.panel{padding:8px;border-width:3px;outline-width:2px}.brand h1{font-size:17px}.brand small{font-size:10px}.stat{padding:5px 0}.stat b{font-size:18px}.goal{margin:7px 0}.effect{margin-top:6px}#board{width:min(39vw,calc((100dvh - 80px)/2),350px)}.touch{display:grid}.help{display:none}.mini{width:96px;height:72px}.box{margin-bottom:7px}}
+@media(max-width:620px) and (orientation:portrait){body{overflow-x:hidden;overflow-y:auto}.shell{display:block;padding:4px 4px max(8px,env(safe-area-inset-bottom))}.game{width:100%;min-height:100svh;height:auto;display:grid;grid-template-columns:minmax(54px,1fr) auto minmax(54px,1fr);grid-template-rows:auto auto auto;gap:4px;align-items:start}.board-wrap{grid-column:2;grid-row:1/3;order:0}.top-actions{margin-bottom:5px;gap:4px}.top-actions button{min-width:0;padding:5px 6px;font-size:11px}.board-frame{padding:4px;border-width:4px;outline-width:2px}#board{width:min(66vw,calc((100svh - 245px)/2),300px)}.left{grid-column:1;grid-row:1/3;width:100%;min-width:0;padding:5px}.brand{margin-bottom:3px}.brand h1{font-size:12px;margin:2px 0}.brand small{font-size:7px;letter-spacing:0}.stat{display:block;text-align:center;padding:4px 1px}.stat span{display:block;font-size:9px}.stat b{font-size:15px}.goal,.effect{display:none}.right{display:contents}.right .box{grid-column:3;width:100%;min-width:0;margin:0;padding:5px;background:var(--panel);border:3px solid #52351e;outline:2px solid #9c6832;box-shadow:inset 0 0 0 2px #213a40}.right .box:nth-of-type(1){grid-row:1}.right .box:nth-of-type(2){grid-row:2}.box h2{font-size:10px;letter-spacing:0;margin-bottom:3px}.mini{width:100%;height:auto;aspect-ratio:4/3}.right .help{display:none}.right .touch{position:static;grid-column:1/-1;grid-row:3;width:100%;margin:5px 0 0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;background:#09151cf2;border:3px solid #704a28;outline:2px solid #b47a38;padding:7px;z-index:auto}.touch-title{font-size:12px;padding:1px}.touch button{min-height:54px;font-size:24px}.touch button[data-act="left"]{grid-column:1}.touch button[data-act="down"]{grid-column:2}.touch button[data-act="right"]{grid-column:3}.touch button[data-act="rotate"]{grid-column:4}.touch button[data-act="drop"]{grid-column:5}.touch button[data-act="hold"]{grid-column:1/4;min-height:46px;font-size:15px}.touch button[data-act="pause"]{display:none}}
+@media(max-width:900px) and (orientation:landscape){body{overflow:hidden}.shell{padding:3px}.game{height:100dvh;grid-template-columns:minmax(145px,1fr) auto minmax(180px,1fr);align-items:center}#board{width:min(29vw,calc((100dvh - 66px)/2),300px)}.brand{margin-bottom:3px}.brand h1{font-size:14px}.stat{padding:3px}.stat b{font-size:16px}.goal,.effect{display:none}.right{display:grid;grid-template-columns:1fr 1fr;gap:5px}.right .touch{grid-column:1/-1}.touch button{min-height:38px}}
+</style>
+</head>
+<body>
+<main class="shell">
+<section class="game">
+  <aside class="panel left">
+    <div class="brand"><small>QIQI'S CRAFT-RIS</small><h1>齊齊專屬的<br>俄羅斯方塊</h1></div>
+    <div class="stat"><span>本局分數</span><b id="score">0</b></div>
+    <div class="stat"><span>關卡</span><b id="level">1</b></div>
+    <div class="stat"><span>消除行數</span><b id="lines">0</b></div>
+    <div class="stat"><span>歷史最高</span><b id="best">0</b></div>
+    <div class="goal"><div class="goal-top"><span>突破目標</span><strong id="goalText">創下第一筆紀錄！</strong></div><div class="bar"><i id="goalBar"></i></div></div>
+    <div class="effect"><strong>道具效果</strong><span id="effectText">消除有圖示的方塊，就會發動驚喜！</span></div>
+  </aside>
+  <section class="board-wrap">
+    <div class="top-actions"><button id="pauseBtn" aria-label="暫停">暫停</button><button id="soundBtn" aria-label="切換音效">音效：開</button><button id="musicBtn" aria-label="切換背景音樂">音樂：開</button></div>
+    <div class="board-frame"><canvas id="board" width="300" height="600" aria-label="俄羅斯方塊遊戲區"></canvas></div>
+  </section>
+  <aside class="panel right">
+    <div class="box"><h2>下一個</h2><canvas id="next" class="mini" width="118" height="88"></canvas></div>
+    <div class="box"><h2>保留區</h2><canvas id="hold" class="mini" width="118" height="88"></canvas></div>
+    <div class="help"><b>操作方法</b><br><span class="key">←</span><span class="key">→</span> 移動　<span class="key">↑</span> 旋轉<br><span class="key">↓</span> 加速　<span class="key">空白</span> 落到底<br><span class="key">C</span> 保留　<span class="key">P</span> 暫停</div>
+    <div class="touch">
+      <div class="touch-title">操作按鈕</div>
+      <button data-act="left" aria-label="向左移動" title="向左移動">◀</button><button data-act="rotate" aria-label="旋轉方塊" title="旋轉方塊">↻</button><button data-act="right" aria-label="向右移動" title="向右移動">▶</button><button data-act="down" aria-label="向下降一格" title="向下降一格">▼</button><button data-act="drop" aria-label="直接落到底" title="直接落到底">⇊</button>
+      <button class="wide" data-act="hold">保留 C</button><button class="wide" data-act="pause">暫停 P</button>
+    </div>
+  </aside>
+</section>
+</main>
+<div id="startModal" class="modal"><div class="card"><div class="trophy">💎</div><h2>齊齊，準備好了嗎？</h2><p>堆疊原創像素方塊、發動神奇道具，突破自己的最高紀錄！</p><button id="startBtn">開始冒險</button></div></div>
+<div id="overModal" class="modal hidden"><div class="card"><div class="trophy">⛏️</div><h2>這次探險結束了</h2><p id="overText"></p><button id="againBtn">再玩一次</button></div></div>
+<div id="trophyPop" class="modal hidden"><div class="card record-card"><div class="trophy">🏆</div><h2>恭喜齊齊打破紀錄！</h2><p>全新的最高分誕生了！</p></div></div>
+<div id="toast" class="toast"></div>
+<script>
+(()=>{
+"use strict";
+const C=10,R=20,S=30, board=document.querySelector("#board"),ctx=board.getContext("2d"),nextCtx=document.querySelector("#next").getContext("2d"),holdCtx=document.querySelector("#hold").getContext("2d");
+const atlas=new Image(); atlas.src="qiqi-sprites.png";
+const SHAPES=[
+ {n:"I",m:[[1,1,1,1]],t:0},{n:"O",m:[[1,1],[1,1]],t:1},{n:"T",m:[[0,1,0],[1,1,1]],t:2},
+ {n:"L",m:[[0,0,1],[1,1,1]],t:3},{n:"J",m:[[1,0,0],[1,1,1]],t:4},{n:"S",m:[[0,1,1],[1,1,0]],t:5},{n:"Z",m:[[1,1,0],[0,1,1]],t:6}
+];
+let grid,cur,nextPiece,holdPiece,canHold,score,lines,level,best,oldBest,dropAt,last,playing=false,paused=false,recordShown=false,boostUntil=0,slowUntil=0,enderCharges=0,sound=true,music=true,musicTimer=null,musicStep=0,raf;
+const $=id=>document.getElementById(id), clone=o=>JSON.parse(JSON.stringify(o));
+function tileRect(i){const w=atlas.naturalWidth/4,h=atlas.naturalHeight/3;return [(i%4)*w,Math.floor(i/4)*h,w,h]}
+function drawTile(g,x,y,size,t,power=-1,alpha=1){g.save();g.globalAlpha=alpha;const r=tileRect(t);g.drawImage(atlas,...r,x+1,y+1,size-2,size-2);g.strokeStyle="#ffffff35";g.lineWidth=1;g.strokeRect(x+1.5,y+1.5,size-3,size-3);if(power>=0){const pr=tileRect(7+power);g.fillStyle="#07121bd0";g.fillRect(x+size*.22,y+size*.22,size*.56,size*.56);g.drawImage(atlas,...pr,x+size*.17,y+size*.17,size*.66,size*.66)}g.restore()}
+function piece(){let p=clone(SHAPES[Math.floor(Math.random()*SHAPES.length)]);p.x=Math.floor((C-p.m[0].length)/2);p.y=-1;p.power=Math.random()<.17?Math.floor(Math.random()*4):-1;p.powerCell=p.power<0?-1:Math.floor(p.m.flat().reduce((a,v)=>a+v,0)*Math.random());return p}
+function reset(){grid=Array.from({length:R},()=>Array(C).fill(null));score=lines=0;level=1;best=+(localStorage.getItem("qiqi-craftris-best")||0);oldBest=best;recordShown=false;boostUntil=slowUntil=enderCharges=0;holdPiece=null;nextPiece=piece();spawn();paused=false;playing=true;last=performance.now();dropAt=last+speed();startMusic();updateUI();$("overModal").classList.add("hidden");cancelAnimationFrame(raf);raf=requestAnimationFrame(loop)}
+function spawn(){cur=nextPiece;nextPiece=piece();cur.x=Math.floor((C-cur.m[0].length)/2);cur.y=-1;canHold=true;if(collide(cur,0,1)){gameOver()}drawMinis()}
+function collide(p,dx=0,dy=0,m=p.m){for(let y=0;y<m.length;y++)for(let x=0;x<m[y].length;x++)if(m[y][x]){let nx=p.x+x+dx,ny=p.y+y+dy;if(nx<0||nx>=C||ny>=R||(ny>=0&&grid[ny][nx]))return true}return false}
+function rotate(){if(!playing||paused)return;const m=cur.m[0].map((_,i)=>cur.m.map(row=>row[i]).reverse());for(const kick of [0,-1,1,-2,2])if(!collide(cur,kick,0,m)){cur.x+=kick;cur.m=m;beep(460,.035);return}}
+function move(dx){if(playing&&!paused&&!collide(cur,dx,0))cur.x+=dx}
+function down(){if(!playing||paused)return;if(!collide(cur,0,1))cur.y++;else lock()}
+function hardDrop(){if(!playing||paused)return;let d=0;while(!collide(cur,0,1)){cur.y++;d++}score+=d*2;lock()}
+function lock(){let pi=0;for(let y=0;y<cur.m.length;y++)for(let x=0;x<cur.m[y].length;x++)if(cur.m[y][x]){let gy=cur.y+y;if(gy<0){gameOver();return}grid[gy][cur.x+x]={t:cur.t,p:pi++===cur.powerCell?cur.power:-1}}clearLines();spawn()}
+function clearLines(){let cleared=[],powers=[];for(let y=R-1;y>=0;y--)if(grid[y].every(Boolean)){cleared.push(y);grid[y].forEach((v,x)=>{if(v.p>=0)powers.push({p:v.p,x,y})})}if(!cleared.length)return;cleared.forEach(y=>{grid.splice(y,1);grid.unshift(Array(C).fill(null))});const pts=[0,100,300,500,800][cleared.length]||1200;score+=pts*(Date.now()<boostUntil?2:1)*level;lines+=cleared.length;level=Math.floor(lines/10)+1;beep(cleared.length===4?880:620,.12);powers.forEach(v=>activate(v.p,v.x,v.y));checkRecord();updateUI()}
+function activate(p,x,y){if(p===0){boostUntil=Date.now()+15000;notice("💎 鑽石加分：15 秒雙倍得分！");beep(1050,.18)}else if(p===1){for(let yy=Math.max(0,y-1);yy<=Math.min(R-1,y+1);yy++)for(let xx=Math.max(0,x-1);xx<=Math.min(C-1,x+1);xx++)grid[yy][xx]=null;score+=150;notice("🧨 TNT 爆炸：清除 3×3 區域！");beep(130,.22)}else if(p===2){slowUntil=Date.now()+10000;notice("⏱️ 紅石時鐘：10 秒慢速喘息！");beep(380,.18)}else{enderCharges++;notice("🟢 終界珍珠：獲得一次免費交換！");beep(760,.18)}}
+function hold(){if(!playing||paused)return;if(!canHold&&enderCharges<=0)return notice("這回合已使用過保留區");if(!canHold)enderCharges--;const tmp=holdPiece;holdPiece=clone({...cur,x:0,y:0});if(tmp){cur=tmp;cur.x=Math.floor((C-cur.m[0].length)/2);cur.y=-1}else spawn();canHold=false;drawMinis();beep(540,.06)}
+function speed(){return Date.now()<slowUntil?900:Math.max(100,900-(level-1)*75)}
+function loop(t){if(!playing)return;if(!paused&&t>=dropAt){down();dropAt=t+speed()}last=t;draw();updateEffects();raf=requestAnimationFrame(loop)}
+function draw(){ctx.clearRect(0,0,board.width,board.height);ctx.fillStyle="#030a0dcc";ctx.fillRect(0,0,board.width,board.height);ctx.strokeStyle="#b6e7ef12";for(let x=0;x<=C;x++){ctx.beginPath();ctx.moveTo(x*S,0);ctx.lineTo(x*S,R*S);ctx.stroke()}for(let y=0;y<=R;y++){ctx.beginPath();ctx.moveTo(0,y*S);ctx.lineTo(C*S,y*S);ctx.stroke()}grid.forEach((row,y)=>row.forEach((v,x)=>v&&drawTile(ctx,x*S,y*S,S,v.t,v.p)));if(cur&&playing){let ghost=cur.y;while(!collide({...cur,y:ghost},0,1))ghost++;drawPiece(ctx,{...cur,y:ghost},S,.22);drawPiece(ctx,cur,S,1)}}
+function drawPiece(g,p,size,a=1,ox=0,oy=0){let pi=0;p.m.forEach((row,y)=>row.forEach((v,x)=>{if(v){drawTile(g,ox+(p.x+x)*size,oy+(p.y+y)*size,size,p.t,pi===p.powerCell?p.power:-1,a);pi++}}))}
+function drawMini(g,p){g.clearRect(0,0,118,88);g.fillStyle="#061016";g.fillRect(0,0,118,88);if(!p)return;const z=22,w=p.m[0].length*z,h=p.m.length*z,copy={...p,x:0,y:0};drawPiece(g,copy,z,1,(118-w)/2,(88-h)/2)}
+function drawMinis(){drawMini(nextCtx,nextPiece);drawMini(holdCtx,holdPiece)}
+function updateUI(){$("score").textContent=score.toLocaleString();$("lines").textContent=lines;$("level").textContent=level;$("best").textContent=Math.max(best,score).toLocaleString();if(oldBest){$("goalText").textContent=oldBest.toLocaleString();$("goalBar").style.width=Math.min(100,score/oldBest*100)+"%"}else{$("goalText").textContent="創下第一筆紀錄！";$("goalBar").style.width=Math.min(100,score/1000*100)+"%"}}
+function updateEffects(){let a=[];if(Date.now()<boostUntil)a.push("💎 雙倍得分 "+Math.ceil((boostUntil-Date.now())/1000)+"秒");if(Date.now()<slowUntil)a.push("⏱️ 慢速 "+Math.ceil((slowUntil-Date.now())/1000)+"秒");if(enderCharges)a.push("🟢 免費交換 × "+enderCharges);$("effectText").textContent=a.join("｜")||"消除有圖示的方塊，就會發動驚喜！"}
+function checkRecord(){if(oldBest>0&&score>oldBest&&!recordShown){recordShown=true;paused=true;$("trophyPop").classList.remove("hidden");levelUp();setTimeout(()=>{$("trophyPop").classList.add("hidden");paused=false;dropAt=performance.now()+speed()},1500)}if(score>best){best=score;localStorage.setItem("qiqi-craftris-best",best)}}
+function gameOver(){playing=false;stopMusic();cancelAnimationFrame(raf);if(score>best){best=score;localStorage.setItem("qiqi-craftris-best",best)}$("overText").textContent=`本次得到 ${score.toLocaleString()} 分，抵達第 ${level} 關；歷史最高 ${best.toLocaleString()} 分！`;$("overModal").classList.remove("hidden");updateUI();beep(110,.5)}
+function pause(){if(!playing)return;paused=!paused;if(paused)stopMusic();else startMusic();$("pauseBtn").textContent=paused?"繼續":"暫停";notice(paused?"遊戲已暫停":"繼續冒險！")}
+function notice(s){const t=$("toast");t.textContent=s;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),1900)}
+function audio(){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;const a=window._qiqiAudio||(window._qiqiAudio=new AC());if(a.state==="suspended")a.resume().catch(()=>{});return a}
+function beep(f,d){if(!sound)return;try{const a=audio();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type="square";o.frequency.value=f;g.gain.setValueAtTime(.07,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+d)}catch{}}
+function levelUp(){if(!sound)return;[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.16),i*120))}
+function musicTone(f,d=.18,v=.025,type="square"){if(!music)return;try{const a=audio();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f,a.currentTime);g.gain.setValueAtTime(v,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+d)}catch{}}
+function musicTick(){const melody=[659,784,880,784,659,523,587,659,698,880,784,698,659,587,523,587];const bass=[131,131,147,147,165,165,147,147];musicTone(melody[musicStep%melody.length],.19,.04,"square");if(musicStep%2===0)musicTone(bass[Math.floor(musicStep/2)%bass.length],.34,.035,"triangle");if(musicStep%4===2)musicTone(1047,.055,.008,"sine");musicStep++}
+function startMusic(){if(!music||musicTimer||!playing||paused)return;musicTick();musicTimer=setInterval(musicTick,230)}
+function stopMusic(){clearInterval(musicTimer);musicTimer=null}
+function act(a){({left:()=>move(-1),right:()=>move(1),rotate,down,drop:hardDrop,hold,pause}[a]||(()=>{}))()}
+document.addEventListener("keydown",e=>{const m={ArrowLeft:"left",ArrowRight:"right",ArrowUp:"rotate",ArrowDown:"down"," ":"drop",c:"hold",C:"hold",p:"pause",P:"pause"};if(m[e.key]){e.preventDefault();act(m[e.key])}});
+document.querySelectorAll("[data-act]").forEach(b=>{let timer,delay;b.addEventListener("pointerdown",e=>{e.preventDefault();b.setPointerCapture?.(e.pointerId);act(b.dataset.act);if(["left","right","down"].includes(b.dataset.act)){delay=setTimeout(()=>{timer=setInterval(()=>act(b.dataset.act),85)},280)}});const stop=()=>{clearTimeout(delay);clearInterval(timer)};b.addEventListener("pointerup",stop);b.addEventListener("pointercancel",stop);b.addEventListener("lostpointercapture",stop)});
+$("startBtn").onclick=()=>{$("startModal").classList.add("hidden");const a=audio();a?.resume?.();reset()};$("againBtn").onclick=reset;$("pauseBtn").onclick=pause;$("soundBtn").onclick=()=>{sound=!sound;$("soundBtn").textContent="音效："+(sound?"開":"關")};$("musicBtn").onclick=()=>{music=!music;$("musicBtn").textContent="音樂："+(music?"開":"關");if(music)startMusic();else stopMusic()};
+atlas.onload=()=>{best=+(localStorage.getItem("qiqi-craftris-best")||0);$("best").textContent=best.toLocaleString();drawMinis();draw()};
+})();
+</script>
+</body>
+</html>
