@@ -70,7 +70,7 @@ button:active{transform:translateY(3px);box-shadow:inset 0 0 0 2px #fff0a3,0 1px
 (()=>{
 "use strict";
 const C=10,R=20,S=30, board=document.querySelector("#board"),ctx=board.getContext("2d"),nextCtx=document.querySelector("#next").getContext("2d"),holdCtx=document.querySelector("#hold").getContext("2d");
-const atlas=new Image(); atlas.src="qiqi-sprites.png?v=gpt-red-crystal-1";
+const atlas=new Image(); atlas.src="qiqi-sprites.png?v=gpt-red-crystal-2";
 const SHAPES=[
  {n:"I",m:[[1,1,1,1]],t:0},{n:"O",m:[[1,1],[1,1]],t:1},{n:"T",m:[[0,1,0],[1,1,1]],t:2},
  {n:"L",m:[[0,0,1],[1,1,1]],t:3},{n:"J",m:[[1,0,0],[1,1,1]],t:4},{n:"S",m:[[0,1,1],[1,1,0]],t:5},{n:"Z",m:[[1,1,0],[0,1,1]],t:6}
